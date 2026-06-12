@@ -1,0 +1,22 @@
+services:
+  - type: web_service
+    name: aura-backend
+    env: python
+    region: oregon
+    plan: starter
+    autoDeploy: true
+    root: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: 1
+
+  - type: static_site
+    name: aura-frontend
+    env: static
+    region: oregon
+    plan: free
+    root: .
+    staticPublishPath: public
+    buildCommand: echo "Static site ready"
