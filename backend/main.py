@@ -1,4 +1,4 @@
-[6/12/2026 9:03 PM] Jean Bean: from fastapi import FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
@@ -119,6 +119,11 @@ def dashboard():
         "pending_approvals": len(approvals_db),
         "monthly_target": 10000
     }
-[6/12/2026 9:03 PM] Jean Bean: @app.get("/api/activity")
+
+@app.get("/api/activity")
 def get_activity():
     return {"activities": activity_log[-50:]}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=8000, reload=False)
