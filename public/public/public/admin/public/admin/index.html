@@ -1,0 +1,161 @@
+[6/12/2026 8:39 PM] Jean Bean: <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AURA Command Center | Elsie AI</title>
+<style>
+:root{--navy:#0A1F44;--blue:#1E3A8A;--gold:#C9A961;--white:#FFFFFF;--offwhite:#FAFBFC;--gray:#4B5563;--border:#E5E7EB}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--offwhite);color:var(--navy);font-family:system-ui,-apple-system,sans-serif;height:100vh;display:flex;overflow:hidden;font-size:14px}
+.sidebar{width:240px;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-header{padding:20px;color:var(--white);font-size:1.1rem;font-weight:700;border-bottom:1px solid rgba(255,255,255,0.1)}
+.sidebar-header span{color:var(--gold);font-weight:400}
+.nav-item{padding:12px 20px;display:flex;align-items:center;gap:10px;cursor:pointer;color:rgba(255,255,255,0.7);font-size:0.83rem;border-left:3px solid transparent;transition:all 0.2s}
+.nav-item:hover,.nav-item.active{color:var(--white);border-left-color:var(--gold);background:rgba(255,255,255,0.05)}
+.nav-badge{margin-left:auto;background:var(--gold);color:var(--navy);font-size:0.65rem;padding:2px 8px;border-radius:10px;font-weight:700}
+.agent-status{margin-top:auto;padding:18px 20px;border-top:1px solid rgba(255,255,255,0.1)}
+.agent-row{display:flex;align-items:center;gap:8px;padding:3px 0;font-size:0.7rem;color:rgba(255,255,255,0.6)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--gold)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:14px 25px;background:var(--white);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.topbar h1{font-size:1rem;font-weight:700;color:var(--navy)}
+.revenue-badge{background:rgba(201,169,97,0.15);color:var(--navy);padding:6px 14px;border-radius:20px;font-weight:700;font-size:0.8rem}
+.content{display:grid;grid-template-columns:1fr 350px;flex:1;overflow:hidden}
+.panel-main{padding:20px;overflow-y:auto}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-box{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:18px}
+.stat-value{font-size:1.7rem;font-weight:700}.stat-value.gold{color:var(--gold)}.stat-value.blue{color:var(--blue)}.stat-value.navy{color:var(--navy)}
+.stat-label{color:var(--gray);font-size:0.7rem;margin-top:3px;text-transform:uppercase;letter-spacing:0.5px}
+.section-card{background:var(--white);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:15px}
+.section-title{font-weight:700;font-size:0.85rem;margin-bottom:12px;color:var(--navy)}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+.chip{background:var(--white);border:1px solid var(--border);color:var(--navy);padding:7px 16px;border-radius:20px;cursor:pointer;font-size:0.75rem;font-weight:500;transition:all 0.2s}
+.chip:hover{border-color:var(--gold);background:rgba(201,169,97,0.05)}
+.feed-panel{background:var(--white);border-left:1px solid var(--border);display:flex;flex-direction:column}
+.feed-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;font-weight:700;font-size:0.8rem;color:var(--navy)}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.feed-log{flex:1;overflow-y:auto;padding:10px 14px}
+.feed-entry{padding:7px 10px;margin-bottom:3px;border-radius:4px;font-size:0.73rem;border-left:2px solid var(--border);color:var(--gray)}
+.feed-entry.info{border-left-color:var(--blue)}.feed-entry.success{border-left-color:#10B981}.feed-entry.warning{border-left-color:var(--gold)}
+.feed-time{color:#94A3B8;margin-right:5px;font-size:0.65rem}.feed-agent{font-weight:600;color:var(--navy)}
+[6/12/2026 8:39 PM] Jean Bean: .elsie-bar{background:var(--white);border-top:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:10px}
+.elsie-avatar{width:34px;height:34px;border-radius:50%;background:var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy);font-size:0.75rem;flex-shrink:0}
+#elsieInput{flex:1;background:var(--offwhite);border:1px solid var(--border);border-radius:20px;padding:10px 16px;color:var(--navy);outline:none;font-size:0.85rem}
+#elsieInput:focus{border-color:var(--gold)}
+.section{display:none}.section.active{display:block}
+.cred-card{background:var(--offwhite);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:8px}
+.cred-card h4{color:var(--navy);margin-bottom:4px;font-size:0.85rem}
+.cred-card p{color:var(--gray);font-size:0.75rem}
+.cred-pass{background:var(--white);padding:8px 12px;border-radius:4px;margin-top:8px;font-family:monospace;color:var(--blue);font-size:0.8rem;border:1px solid var(--border)}
+.btn-sm{background:var(--gold);color:var(--navy);border:none;padding:7px 16px;border-radius:4px;cursor:pointer;font-weight:700;font-size:0.75rem;margin-top:8px}
+.studio-select{width:100%;padding:9px;background:var(--offwhite);border:1px solid var(--border);border-radius:4px;color:var(--navy);margin-bottom:10px;font-size:0.8rem}
+.upload-zone{border:2px dashed var(--border);border-radius:8px;padding:25px;text-align:center;margin:10px 0;cursor:pointer;color:var(--gray)}
+.upload-zone:hover{border-color:var(--gold);color:var(--navy)}
+</style>
+</head>
+<body>
+<script>if(localStorage.getItem('aura_admin_auth')!=='true'){window.location.href='/admin/login.html';}</script>
+
+<div class="sidebar">
+<div class="sidebar-header">AURA <span>C2</span></div>
+<div class="nav-item active" onclick="switchTab('dashboard',this)">📊 Command Center</div>
+<div class="nav-item" onclick="switchTab('jobs',this)">🌍 Job Board <span class="nav-badge" id="jobCount">0</span></div>
+<div class="nav-item" onclick="switchTab('projects',this)">⚙️ Projects</div>
+<div class="nav-item" onclick="switchTab('deliver',this)">📦 Deliver</div>
+<div class="nav-item" onclick="switchTab('approvals',this)">🔔 Approvals <span class="nav-badge" id="appCount">0</span></div>
+<div class="nav-item" onclick="switchTab('credentials',this)">🔐 Vault</div>
+<div class="nav-item" onclick="switchTab('library',this)">📚 Library</div>
+<div class="nav-item" onclick="switchTab('studio',this)">🎥 Studio</div>
+<div class="agent-status">
+<div class="agent-row"><span class="dot"></span> Elsie — Online</div>
+<div class="agent-row"><span class="dot"></span> Scout — 70 Platforms</div>
+<div class="agent-row"><span class="dot"></span> Builder — Ready</div>
+<div class="agent-row"><span class="dot"></span> Treasury — Active</div>
+</div>
+</div>
+
+<div class="main">
+<div class="topbar"><h1>Command Center</h1><span style="color:var(--gray);font-size:0.8rem;" id="clock"></span><div class="revenue-badge">💰 $<span id="rev">0</span> Month</div></div>
+<div class="content">
+<div class="panel-main">
+<div id="dashboardTab" class="section active">
+<div class="stats-row">
+<div class="stat-box"><div class="stat-value gold">750+</div><div class="stat-label">AI Specialists</div></div>
+<div class="stat-box"><div class="stat-value blue">70</div><div class="stat-label">Platforms</div></div>
+<div class="stat-box"><div class="stat-value navy" id="sApprovals">0</div><div class="stat-label">Awaiting You</div></div>
+<div class="stat-box"><div class="stat-value blue" id="sJobs">0</div><div class="stat-label">Jobs Found Today</div></div>
+</div>
+<div class="chip-row">
+<button class="chip" onclick="sendCmd('Find new jobs on all platforms')">🔍 Find Jobs</button>
+<button class="chip" onclick="sendCmd('Status report')">📊 Status</button>
+<button class="chip" onclick="sendCmd('Create interview room')">🎥 Studio</button>
+[6/12/2026 8:39 PM] Jean Bean: <button class="chip" onclick="sendCmd('Show Treasury balance')">💰 Treasury</button>
+<button class="chip" onclick="sendCmd('Check all deadlines')">⏰ Deadlines</button>
+</div>
+<div class="section-card"><div class="section-title">🤖 Elsie Briefing</div><p style="color:var(--gray);font-size:0.8rem;" id="briefing">Elsie standing by. Type a command or use quick chips above.</p></div>
+</div>
+<div id="jobsTab" class="section"><div class="section-card"><div class="section-title">🌍 Jobs Across 70 Platforms</div><div id="jobList" style="color:var(--gray);">Click "Find Jobs" to begin global search.</div></div></div>
+<div id="projectsTab" class="section"><div class="section-card"><div class="section-title">⚙️ Active Projects</div><p style="color:var(--gray);">Win jobs to see them here.</p></div></div>
+<div id="deliverTab" class="section"><div class="section-card"><div class="section-title">📦 Ready to Deliver</div><p style="color:var(--gray);">Completed projects appear here for review.</p></div></div>
+<div id="approvalsTab" class="section"><div class="section-card"><div class="section-title">🔔 Pending Your Approval</div><p style="color:var(--gray);">No items waiting.</p></div></div>
+<div id="credentialsTab" class="section">
+<div class="section-card"><div class="section-title">🔐 Credentials Vault</div>
+<div class="cred-card"><h4>📧 Proton Mail</h4><p>aurabi@proton.me</p><div class="cred-pass">pintogee12</div><button class="btn-sm" onclick="navigator.clipboard.writeText('pintogee12')">📋 Copy</button></div>
+<div class="cred-card"><h4>🐱 GitHub</h4><p>aura-technologies-ai</p><div class="cred-pass">educate@12345</div><button class="btn-sm" onclick="navigator.clipboard.writeText('educate@12345')">📋 Copy</button></div>
+<div class="cred-card"><h4>📧 Business Email</h4><p>founder@aurabi1.com</p><div class="cred-pass">Elsie will configure</div></div>
+</div>
+</div>
+<div id="libraryTab" class="section"><div class="section-card"><div class="section-title">📚 Document Library</div><div class="upload-zone">📤 Drop files here or click to upload<br><small>Ghana ID, Selfie, Signature, Address Proof</small></div></div></div>
+<div id="studioTab" class="section"><div class="section-card"><div class="section-title">🎥 Interview Studio</div><select class="studio-select" id="stuPlatform"><option value="upwork">Upwork</option><option value="fiverr">Fiverr</option><option value="toptal">Toptal</option><option value="freelancer">Freelancer.com</option><option value="client">Client Meeting</option></select><button class="btn-sm" style="width:100%;" onclick="createStudio()">🎥 Create Interview Room</button><div id="studioResult" style="margin-top:10px;"></div></div></div>
+</div>
+<div class="feed-panel">
+<div class="feed-header"><div class="live-dot"></div>Live Activity</div>
+<div class="feed-log" id="feed"><div class="feed-entry info"><span class="feed-time">--:--</span><span class="feed-agent">System:</span> Command Center ready.</div></div>
+</div>
+</div>
+<div class="elsie-bar">
+<div class="elsie-avatar">E</div>
+<input type="text" id="elsieInput" placeholder="Command Elsie..." onkeypress="if(event.key==='Enter')sendCmd()">
+<button class="btn-sm" onclick="sendCmd()" style="border-radius:50%;width:34px;height:34px;padding:0;">➤</button>
+</div>
+</div>
+
+<script>
+function switchTab(tab,el){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.getElementById(tab+'Tab').classList.add('active');
+document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+if(el)el.classList.add('active');
+}
+function addFeed(status,agent,action){
+var feed=document.getElementById('feed');
+var time=new Date().toLocaleTimeString('en-US',{hour12:false});
+var div=document.createElement('div');
+div.className='feed-entry '+status;
+div.innerHTML='<span class="feed-time">'+time+'</span><span class="feed-agent">'+agent+':</span> '+action;
+[6/12/2026 8:39 PM] Jean Bean: feed.insertBefore(div,feed.firstChild);
+while(feed.children.length>100)feed.removeChild(feed.lastChild);
+}
+function sendCmd(text){
+var input=document.getElementById('elsieInput');
+var cmd=text||input.value.trim();
+if(!cmd)return;
+addFeed('info','You',cmd);
+if(!text)input.value='';
+setTimeout(function(){
+addFeed('success','Elsie','Command received: "'+cmd+'". I will execute via Render backend once connected.');
+},600);
+}
+function createStudio(){
+var p=document.getElementById('stuPlatform').value;
+var url='https://meet.jit.si/AURA-'+p+'-'+Date.now().toString(36);
+document.getElementById('studioResult').innerHTML='<div style="background:var(--offwhite);border:1px solid var(--gold);border-radius:8px;padding:16px;margin-top:10px;"><strong style="color:var(--navy);">✅ Studio Ready</strong><br><a href="'+url+'" target="_blank" style="color:var(--blue);">🎥 Join Interview Room</a></div>';
+addFeed('success','Studio','Room created for '+p);
+}
+setInterval(function(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false});},1000);
+addFeed('info','System','Welcome Founder. 750+ specialists standing by.');
+</script>
+</body>
+</html>
