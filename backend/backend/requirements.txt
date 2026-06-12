@@ -1,2 +1,2 @@
 fastapi==0.104.1
-Uvicorn==0.24.0
+uvicorn[standard]==0.30.6
