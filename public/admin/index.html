@@ -1,3 +1,4 @@
+<script>
 const API_URL = 'https://aura-api.onrender.com';
 
 function switchTab(tab,el){
@@ -44,3 +45,4 @@ setInterval(async()=>{try{const res=await fetch(API_URL+'/api/activity');const d
 
 setInterval(function(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false});},1000);
 addFeed('info','System','Welcome Founder. Type a command below.');
+</script>
