@@ -2,47 +2,55 @@
 const API_URL = 'https://aura-api.onrender.com';
 
 function switchTab(tab,el){
-document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-document.getElementById(tab+'Tab').classList.add('active');
-document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-if(el)el.classList.add('active');
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(tab+'Tab').classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
 }
 
 function addFeed(status,agent,action){
-var feed=document.getElementById('feed');
-var time=new Date().toLocaleTimeString('en-US',{hour12:false});
-var div=document.createElement('div');
-div.className='feed-entry '+status;
-div.innerHTML='<span class="feed-time">'+time+'</span><span class="feed-agent">'+agent+':</span> '+action;
-feed.insertBefore(div,feed.firstChild);
-while(feed.children.length>100)feed.removeChild(feed.lastChild);
+  var feed=document.getElementById('feed');
+  if(!feed)return;
+  var time=new Date().toLocaleTimeString('en-US',{hour12:false});
+  var div=document.createElement('div');
+  div.className='feed-entry '+status;
+  div.innerHTML='<span class="feed-time">'+time+'</span><span class="feed-agent">'+agent+':</span> '+action;
+  feed.insertBefore(div,feed.firstChild);
+  while(feed.children.length>100)feed.removeChild(feed.lastChild);
 }
 
 async function sendCmd(text){
-var input=document.getElementById('elsieInput');
-var cmd=text||input.value.trim();
-if(!cmd)return;
-addFeed('info','You',cmd);
-if(!text)input.value='';
-try{
-const res=await fetch(API_URL+'/api/elsie-command',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({command:cmd})});
-const data=await res.json();
-if(data.response)addFeed('success','Elsie',data.response);
-if(data.jobs){var html='';data.jobs.forEach(j=>{html+='<div style="background:var(--offwhite);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;"><strong style="color:var(--navy);">'+j.title+'</strong><br><span style="color:var(--gray);font-size:0.8rem;">'+j.platform+' · '+j.budget+' · Score: '+j.score+'%</span></div>';});document.getElementById('jobList').innerHTML=html;document.getElementById('sJobs').textContent=data.jobs.length;}
-}catch(e){addFeed('error','System','Cannot reach Elsie.');}
+  var input=document.getElementById('elsieInput');
+  var cmd=text||input.value.trim();
+  if(!cmd)return;
+  addFeed('info','You',cmd);
+  if(!text)input.value='';
+  try{
+    const res=await fetch(API_URL+'/api/elsie-command',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({command:cmd})});
+    const data=await res.json();
+    if(data.response)addFeed('success','Elsie',data.response);
+    if(data.jobs){
+      var html='';
+      data.jobs.forEach(j=>{
+        html+='<div style="background:var(--offwhite);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;"><strong style="color:var(--navy);">'+j.title+'</strong><br><span style="color:var(--gray);font-size:0.8rem;">'+j.platform+' · '+j.budget+' · Score: '+j.score+'%</span></div>';
+      });
+      document.getElementById('jobList').innerHTML=html;
+      document.getElementById('sJobs').textContent=data.jobs.length;
+    }
+  }catch(e){addFeed('error','System','Cannot reach Elsie.');}
 }
 
 function createStudio(){
-var p=document.getElementById('stuPlatform').value;
-var url='https://meet.jit.si/AURA-'+p+'-'+Date.now().toString(36);
-document.getElementById('studioResult').innerHTML='<div style="background:var(--offwhite);border:1px solid var(--gold);border-radius:8px;padding:16px;margin-top:10px;"><strong style="color:var(--navy);">✅ Studio Ready</strong><br><a href="'+url+'" target="_blank" style="color:var(--blue);">🎥 Join Interview Room</a></div>';
-addFeed('success','Studio','Room created for '+p);
+  var p=document.getElementById('stuPlatform').value;
+  var url='https://meet.jit.si/AURA-'+p+'-'+Date.now().toString(36);
+  document.getElementById('studioResult').innerHTML='<div style="background:var(--offwhite);border:1px solid var(--gold);border-radius:8px;padding:16px;margin-top:10px;"><strong style="color:var(--navy);">✅ Studio Ready</strong><br><a href="'+url+'" target="_blank" style="color:var(--blue);">🎥 Join Interview Room</a></div>';
+  addFeed('success','Studio','Room created for '+p);
 }
 
 setInterval(async()=>{try{const res=await fetch(API_URL+'/api/activity');const data=await res.json();if(data.activities)data.activities.forEach(a=>{addFeed(a.status||'info',a.agent,a.action);});}catch(e){}},5000);
 
 (async()=>{try{const res=await fetch(API_URL+'/api/dashboard');const data=await res.json();document.getElementById('sJobs').textContent=data.jobs_found0;document.getElementById('sApprovals').textContent=data.pending_approvals0;document.getElementById('rev').textContent=data.monthly_target||0;addFeed('success','Elsie','Connected. 750+ agents ready.');}catch(e){addFeed('warning','System','Connecting to backend...');}})();
 
-setInterval(function(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-US',{hour12:false});},1000);
+setInterval(function(){var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('en-US',{hour12:false});},1000);
 addFeed('info','System','Welcome Founder. Type a command below.');
 </script>
