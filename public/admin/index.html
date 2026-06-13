@@ -1,9 +1,95 @@
+[6/13/2026 2:39 PM] Jean Bean: <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AURA Command Center</title>
+<style>
+:root{--navy:#0a192f;--gold:#ffd700;--white:#fff;--gray:#8892b0;--blue:#64ffda;--offwhite:#ccd6f6;--border:#233554}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--navy);color:var(--white);display:flex;height:100vh;overflow:hidden}
+.sidebar{width:260px;background:rgba(17,34,64,0.95);border-right:1px solid var(--border);padding:20px;display:flex;flex-direction:column}
+.logo{font-size:1.8rem;font-weight:900;color:var(--gold);margin-bottom:30px}
+.nav-item{padding:12px 16px;margin:4px 0;border-radius:8px;cursor:pointer;color:var(--gray);transition:0.2s}
+.nav-item:hover,.nav-item.active{background:rgba(100,255,218,0.1);color:var(--blue)}
+.main{flex:1;display:flex;flex-direction:column}
+.header{padding:20px 30px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.status-dot{width:10px;height:10px;background:var(--blue);border-radius:50%;display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.content{flex:1;padding:30px;overflow-y:auto}
+.section{display:none}
+.section.active{display:block}
+.card{background:rgba(17,34,64,0.6);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.stat-card{background:rgba(10,25,47,0.8);border:1px solid var(--border);border-radius:8px;padding:20px;text-align:center}
+.stat-value{font-size:2rem;font-weight:900;color:var(--gold)}
+.stat-label{color:var(--gray);font-size:0.85rem;margin-top:4px}
+.feed-entry{padding:10px 12px;margin:6px 0;border-radius:6px;border-left:3px solid var(--gray);background:rgba(17,34,64,0.4);font-size:0.9rem}
+.feed-entry.success{border-left-color:var(--blue)}
+.feed-entry.error{border-left-color:#ff5555}
+.feed-entry.info{border-left-color:var(--gold)}
+.feed-time{color:var(--gray);font-size:0.75rem;margin-right:8px}
+.feed-agent{color:var(--blue);font-weight:700;margin-right:6px}
+.input-group{display:flex;gap:10px;margin-top:16px}
+.input-group input{flex:1;padding:12px 16px;background:rgba(10,25,47,0.8);border:1px solid var(--border);border-radius:8px;color:var(--white);font-size:1rem}
+.btn{padding:12px 24px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-weight:700;cursor:pointer}
+.btn:hover{opacity:0.9}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="logo">AURA</div>
+  <div class="nav-item active" onclick="switchTab('dashboard',this)">Dashboard</div>
+  <div class="nav-item" onclick="switchTab('jobs',this)">Jobs</div>
+  <div class="nav-item" onclick="switchTab('studio',this)">Studio</div>
+</div>
+
+<div class="main">
+  <div class="header">
+    <div><span class="status-dot"></span> <strong>Command Center</strong></div>
+    <div id="clock">--:--</div>
+  </div>
+  
+  <div class="content">
+    <div id="dashboardTab" class="section active">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-value" id="sJobs">0</div><div class="stat-label">Jobs Found</div></div>
+        <div class="stat-card"><div class="stat-value" id="sApprovals">0</div><div class="stat-label">Pending</div></div>
+        <div class="stat-card"><div class="stat-value" id="rev">$0</div><div class="stat-label">Monthly Target</div></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:12px;color:var(--gold)">Elsie Activity Feed</h3>
+        <div id="feed"></div>
+        <div class="input-group">
+          <input type="text" id="elsieInput" placeholder="Type command: status, find jobs, create studio..." onkeypress="if(event.key==='Enter')sendCmd()">
+          <button class="btn" onclick="sendCmd()">Send</button>
+        </div>
+      </div>
+    </div>
+[6/13/2026 2:39 PM] Jean Bean: <div id="jobsTab" class="section">
+      <div class="card"><h3 style="color:var(--gold);margin-bottom:16px">Job Matches</h3><div id="jobList">No jobs yet. Type "find jobs" in Elsie.</div></div>
+    </div>
+
+    <div id="studioTab" class="section">
+      <div class="card">
+        <h3 style="color:var(--gold);margin-bottom:16px">Studio Creator</h3>
+        <select id="stuPlatform" style="padding:10px;background:rgba(10,25,47,0.8);color:var(--white);border:1px solid var(--border);border-radius:8px;width:100%;margin-bottom:12px">
+          <option>Upwork</option><option>Fiverr</option><option>LinkedIn</option>
+        </select>
+        <button class="btn" onclick="createStudio()">Create Studio Room</button>
+        <div id="studioResult"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 const API_URL = 'https://aura-api.onrender.com';
 
 function switchTab(tab,el){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById(tab+'Tab').classList.add('active');
+  var target=document.getElementById(tab+'Tab');
+  if(target)target.classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(el)el.classList.add('active');
 }
@@ -21,36 +107,51 @@ function addFeed(status,agent,action){
 
 async function sendCmd(text){
   var input=document.getElementById('elsieInput');
-  var cmd=text||input.value.trim();
+  var cmd=text||(input?input.value.trim():'');
   if(!cmd)return;
   addFeed('info','You',cmd);
-  if(!text)input.value='';
+  if(input)input.value='';
   try{
     const res=await fetch(API_URL+'/api/elsie-command',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({command:cmd})});
     const data=await res.json();
     if(data.response)addFeed('success','Elsie',data.response);
     if(data.jobs){
-      var html='';
-      data.jobs.forEach(j=>{
-        html+='<div style="background:var(--offwhite);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;"><strong style="color:var(--navy);">'+j.title+'</strong><br><span style="color:var(--gray);font-size:0.8rem;">'+j.platform+' · '+j.budget+' · Score: '+j.score+'%</span></div>';
-      });
-      document.getElementById('jobList').innerHTML=html;
-      document.getElementById('sJobs').textContent=data.jobs.length;
+      var jobList=document.getElementById('jobList');
+      var sJobs=document.getElementById('sJobs');
+      if(jobList){
+        var html='';
+        data.jobs.forEach(j=>{
+          html+='<div style="background:var(--offwhite);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:10px;"><strong style="color:var(--navy);">'+j.title+'</strong><br><span style="color:var(--gray);font-size:0.8rem;">'+j.platform+' · '+j.budget+' · Score: '+j.score+'%</span></div>';
+        });
+        jobList.innerHTML=html;
+      }
+      if(sJobs)sJobs.textContent=data.jobs.length;
     }
-  }catch(e){addFeed('error','System','Cannot reach Elsie.');}
+  }catch(e){addFeed('error','System','Cannot reach Elsie. Check if Render backend is awake.');}
 }
 
 function createStudio(){
-  var p=document.getElementById('stuPlatform').value;
-  var url='https://meet.jit.si/AURA-'+p+'-'+Date.now().toString(36);
-  document.getElementById('studioResult').innerHTML='<div style="background:var(--offwhite);border:1px solid var(--gold);border-radius:8px;padding:16px;margin-top:10px;"><strong style="color:var(--navy);">✅ Studio Ready</strong><br><a href="'+url+'" target="_blank" style="color:var(--blue);">🎥 Join Interview Room</a></div>';
-  addFeed('success','Studio','Room created for '+p);
+  var p=document.getElementById('stuPlatform');
+  var result=document.getElementById('studioResult');
+  if(!p||!result)return;
+  var url='https://meet.jit.si/AURA-'+p.value+'-'+Date.now().toString(36);
+  result.innerHTML='<div style="background:var(--offwhite);border:1px solid var(--gold);border-radius:8px;padding:16px;margin-top:10px;"><strong style="color:var(--navy);">✅ Studio Ready</strong><br><a href="'+url+'" target="_blank" style="color:var(--blue);">🎥 Join Interview Room</a></div>';
+  addFeed('success','Studio','Room created for '+p.value);
 }
 
 setInterval(async()=>{try{const res=await fetch(API_URL+'/api/activity');const data=await res.json();if(data.activities)data.activities.forEach(a=>{addFeed(a.status||'info',a.agent,a.action);});}catch(e){}},5000);
 
-(async()=>{try{const res=await fetch(API_URL+'/api/dashboard');const data=await res.json();document.getElementById('sJobs').textContent=data.jobs_found0;document.getElementById('sApprovals').textContent=data.pending_approvals0;document.getElementById('rev').textContent=data.monthly_target||0;addFeed('success','Elsie','Connected. 750+ agents ready.');}catch(e){addFeed('warning','System','Connecting to backend...');}})();
+document.addEventListener('DOMContentLoaded',async()=>{
+  try{const res=await fetch(API_URL+'/api/dashboard');const data=await res.json();
+    var sJobs=document.getElementById('sJobs'); if(sJobs)sJobs.textContent=data.jobs_found||0;
+[6/13/2026 2:39 PM] Jean Bean: var sApprovals=document.getElementById('sApprovals'); if(sApprovals)sApprovals.textContent=data.pending_approvals||0;
+    var rev=document.getElementById('rev'); if(rev)rev.textContent=data.monthly_target||0;
+    addFeed('success','Elsie','Connected. 750+ agents ready.');
+  }catch(e){addFeed('warning','System','Connecting to backend...');}
+});
 
 setInterval(function(){var el=document.getElementById('clock');if(el)el.textContent=new Date().toLocaleTimeString('en-US',{hour12:false});},1000);
 addFeed('info','System','Welcome Founder. Type a command below.');
 </script>
+</body>
+</html>
