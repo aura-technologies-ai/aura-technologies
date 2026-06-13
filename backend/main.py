@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from datetime import datetime
 import random
 import uuid
+import os
 
 app = FastAPI(title="AURA Technologies API")
 
@@ -78,7 +79,7 @@ def elsie_command(cmd: Command):
     elif "status" in c or "briefing" in c:
         briefing = f"""
 📊 AURA STATUS — {datetime.now().strftime('%B %d, %Y %H:%M')}
-━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━
 🟢 Elsie: Online & Active
 🔍 Jobs Today: {len(jobs_db)}
 ⚙️ Active Projects: {len(projects_db)}
@@ -91,7 +92,7 @@ def elsie_command(cmd: Command):
         return {"response": briefing}
     
     elif "treasury" in c or "revenue" in c:
-        return {"response": "💰 Treasury Report\n━━━━━━━━━━\nMonthly Target: $10,000\nCurrent: Tracking from Day 1\nCelestine: Active & Monitoring\n\nAll revenue streams initializing."}
+        return {"response": "💰 Treasury Report\n━━━━━━━━━━\nMonthly Target: $10,000\nCurrent: Tracking from Day 1\nCelestine: Active & Monitoring\nAll revenue streams initializing."}
     
     elif "deadline" in c:
         return {"response": "⏰ No urgent deadlines. All projects on track."}
@@ -119,13 +120,11 @@ def dashboard():
         "pending_approvals": len(approvals_db),
         "monthly_target": 10000
     }
-
 @app.get("/api/activity")
 def get_activity():
     return {"activities": activity_log[-50:]}
 
-if __name__ == "__main__":
-    import os
+if name == "main":
     import uvicorn
     port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port, reload=False)
+    uvicorn.run(app, host="0.0.0.0", port=port)
